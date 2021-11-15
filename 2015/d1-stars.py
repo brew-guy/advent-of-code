@@ -1,12 +1,13 @@
 import os, sys
 
 path = os.path.join(sys.path[0], "d1-input-1.txt")
-with open(path, "r") as fp:
-    lines = fp.readlines()
+with open(path, mode="r") as f:
+    lines = f.readlines()
 
 # Part 1
 directions = lines[0]
 floor = directions.count("(") - directions.count(")")
+
 print(f"Star 1: {floor}")
 
 # Part 2
