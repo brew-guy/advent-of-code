@@ -1,14 +1,18 @@
-import os, sys
+import time
+from helpers import *
 
-path = os.path.join(sys.path[0], "d1-input-1.txt")
-with open(path, mode="r") as f:
+t = time.time()
+
+
+input = "d1-input.txt"
+with open(input) as f:
     lines = f.readlines()
 
 # Part 1
 directions = lines[0]
 floor = directions.count("(") - directions.count(")")
 
-print(f"Star 1: {floor}")
+dropstar(1, floor, t)
 
 # Part 2
 dirs = {"(": 1, ")": -1}
@@ -18,4 +22,4 @@ for index, direction in enumerate(directions):
     if floor == -1:
         break
 
-print(f"Star 2: {index + 1}")
+dropstar(2, index + 1, t)

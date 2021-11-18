@@ -1,15 +1,19 @@
-import os, sys
+import time
+from helpers import *
 
-path = os.path.join(sys.path[0], "d4-input-1.txt")
-with open(path, mode="r") as f:
-    lines = f.readlines()
+t = time.time()
+
+# input = "d4-input.txt"
+
+# with open(input) as f:
+#     lines = f.readlines()
 
 secret_key = "iwrupvqb"
 
 # Part 1
 
-# print(f"Star 7: {len(houses)}")
+# dropstar(7, , t)
 
 # Part 2
 
-# print(f"Star 8: {len(houses)}")
+# dropstar(8, , t)

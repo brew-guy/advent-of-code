@@ -1,9 +1,13 @@
-import os, sys
+import time
+from helpers import *
 
-path = os.path.join(sys.path[0], "d3-input-1.txt")
-with open(path, mode="r") as f:
+t = time.time()
+
+input = "d3-input.txt"
+with open(input) as f:
     lines = f.readlines()
 
+# Part 1
 directions = [pointer for pointer in lines[0]]
 course = {
     "<": (-1, 0),
@@ -15,7 +19,7 @@ course = {
 current_pos = (0, 0)
 houses = {current_pos: 1}
 
-
+# drop off a present in a house
 def dropoff(current_pos, houses):
     if current_pos in houses:
         houses[current_pos] += 1
@@ -23,7 +27,6 @@ def dropoff(current_pos, houses):
         houses[current_pos] = 1
 
 
-# Part 1
 for next in directions:
     change_pos = course[next]
     current_pos = tuple(
@@ -31,7 +34,7 @@ for next in directions:
     )
     dropoff(current_pos, houses)
 
-print(f"Star 5: {len(houses)}")
+dropstar(5, len(houses), t)
 
 # Part 2
 santa_current_pos = (0, 0)
@@ -58,4 +61,4 @@ for next in pairwise(directions):
     dropoff(santa_current_pos, houses)
     dropoff(robo_current_pos, houses)
 
-print(f"Star 6: {len(houses)}")
+dropstar(6, len(houses), t)
