@@ -3,8 +3,8 @@ import time
 
 def dropstar(star_number, answer, startTime):
     laptime = time.time() - startTime
-    print(f"Execution time in seconds: {laptime}")
-    print(f"Star {star_number}: {answer}")
+    # print(f"Execution time in seconds: {laptime}")
+    print(f"Star {star_number}: {answer} | Calc time: {laptime}")
 
 
 # class Starclass(object):
