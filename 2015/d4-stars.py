@@ -17,7 +17,7 @@ dropstar(7, i - 1, t)
 
 # Part 2
 i, md5hex = 0, ""
-while md5hex[:5] != "000000":
+while md5hex[:6] != "000000":
     key_iteration = secret_key + str(i)
     md5 = hashlib.md5(key_iteration.encode())
     md5hex = md5.hexdigest()
