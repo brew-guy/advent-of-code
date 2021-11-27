@@ -54,7 +54,7 @@ dropstar(11, sum(grid), t)
 
 # What it looks like in pixels
 data = [int(bit) for bit in grid]
-plt.imsave("lightshow.png", np.array(data).reshape(1000, 1000), cmap=cm.gray)
+plt.imsave("d6-lightshow-1.png", np.array(data).reshape(1000, 1000), cmap=cm.gray)
 
 # Part 2
 grid = np.zeros(1000 * 1000)
@@ -81,4 +81,4 @@ dropstar(12, int(sum(grid)), t)
 
 # What it looks like in pixels
 data = [int(bit) for bit in grid]
-plt.imsave("lightshow2.png", np.array(data).reshape(1000, 1000), cmap=cm.gray)
+plt.imsave("d6-lightshow-2.png", np.array(data).reshape(1000, 1000), cmap=cm.gray)

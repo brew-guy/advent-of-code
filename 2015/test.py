@@ -1,8 +1,12 @@
-from matplotlib.pyplot import grid
+import re
+from time import process_time_ns
 
+a = "Orangutang"
 
-t = [[0] * 3 for i in range(3)]
-print(t)
+regexp = r"an"
+match = re.finditer(regexp, a)
 
-grid2 = ["." * 10 for _ in range(10)]
-print(grid2)
+replace = "*"
+for m in match:
+    print(a[: m.start()] + replace + a[m.end() :])
+

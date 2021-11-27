@@ -1,4 +1,6 @@
 import time
+import numpy as np
+from array2gif import write_gif
 from helpers import *
 
 t = time.time()
@@ -44,8 +46,14 @@ def newState(x, y, grid):
     return "."
 
 
+def grid2numpy(grid):
+    array = [[[255, 0, 0] if c == "#" else [0, 0, 0] for c in r] for r in grid]
+    return np.array(array)
+
+
 grid = addPadding(grid, ".")
 current_frame = grid
+gif_dataset = []
 
 for i in range(100):
     next_frame = []
@@ -54,11 +62,15 @@ for i in range(100):
             [newState(row, col, current_frame) for col in range(padding, 100 + padding)]
         )
         next_frame.append(new_row)
+    gif_dataset.append(grid2numpy(next_frame))
     next_frame = addPadding(next_frame, ".")
     current_frame = next_frame.copy()
 
 current_frame = trimPadding(current_frame)
 lights_on = sum([row.count("#") for row in current_frame])
+
+# What does it look like animated?
+write_gif(gif_dataset, "d18-animated-1.gif", fps=5)
 
 dropstar(35, lights_on, t)
 
@@ -76,6 +88,7 @@ def lightCorners(grid):
 
 
 current_frame = grid
+gif_dataset = []
 
 for i in range(100):
     next_frame = []
@@ -85,11 +98,14 @@ for i in range(100):
         )
         next_frame.append(new_row)
     next_frame = lightCorners(next_frame)
+    gif_dataset.append(grid2numpy(next_frame))
     next_frame = addPadding(next_frame, ".")
     current_frame = next_frame.copy()
 
 current_frame = trimPadding(current_frame)
 lights_on = sum([row.count("#") for row in current_frame])
 
+# What does it look like animated?
+write_gif(gif_dataset, "d18-animated-2.gif", fps=5)
 
 dropstar(36, lights_on, t)
