@@ -57,7 +57,7 @@ joy = [getHappiness(party) for party in all_possible_parties]
 dropstar(25, max(joy), t)
 
 # Part 2
-input = "d13-input2.txt"
+input = "d13-input-2.txt"
 with open(input) as f:
     seating = f.readlines()
 
