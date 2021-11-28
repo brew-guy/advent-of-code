@@ -3,7 +3,7 @@ from helpers import *
 
 t = time.time()
 
-input = "d6-input.txt"
+input = mypath + "d6-input.txt"
 with open(input) as f:
     forms = f.read()
 

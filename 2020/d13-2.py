@@ -1,12 +1,11 @@
 # Day 13 - Part 2
 
 import time
-import math
 
 startTime = time.time()
 
 # Read notes to array
-input = "d13-input.txt"
+input = mypath + "d13-input.txt"
 with open(input) as f:
     notes = f.read().splitlines()
 bus_table = notes[1].split(",")

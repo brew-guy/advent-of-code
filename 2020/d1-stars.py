@@ -5,7 +5,7 @@ from helpers import *
 
 t = time.time()
 
-input = "d1-input.txt"
+input = mypath + "d1-input.txt"
 with open(input) as f:
     lines = f.read()
 

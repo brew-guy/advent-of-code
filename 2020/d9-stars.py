@@ -4,7 +4,7 @@ from helpers import *
 t = time.time()
 
 # Read XMAS data numbers to array
-input = "d9-input.txt"
+input = mypath + "d9-input.txt"
 with open(input) as f:
     XMASdata = [int(line) for line in f]
 

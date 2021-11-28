@@ -4,7 +4,7 @@ from helpers import *
 t = time.time()
 
 # Read seat layout as array of arrays of characters
-input = "d11-input.txt"
+input = mypath + "d11-input.txt"
 with open(input) as f:
     layout = [list(i) for i in f.read().splitlines()]
 

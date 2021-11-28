@@ -4,7 +4,7 @@ from helpers import *
 t = time.time()
 
 # Read bag rules to dictionary
-input = "d7-input.txt"
+input = mypath + "d7-input.txt"
 with open(input) as f:
     rules = f.read().splitlines()
 

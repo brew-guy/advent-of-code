@@ -4,7 +4,7 @@ from helpers import *
 t = time.time()
 
 # Read adapter joltages to a sorted array
-input = "d10-input.txt"
+input = mypath + "d10-input.txt"
 with open(input) as f:
     adapter_joltages = sorted([int(line) for line in f])
 

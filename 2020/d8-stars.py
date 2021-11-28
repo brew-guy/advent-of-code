@@ -3,7 +3,7 @@ from helpers import *
 
 t = time.time()
 
-input = "d8-input.txt"
+input = mypath + "d8-input.txt"
 with open(input) as f:
     program = f.read().splitlines()
 

@@ -5,7 +5,7 @@ from helpers import *
 t = time.time()
 
 # Read initialization program to array
-input = "d14-input.txt"
+input = mypath + "d14-input.txt"
 with open(input) as f:
     initialization_program = f.read().splitlines()
 

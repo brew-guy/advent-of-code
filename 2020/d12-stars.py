@@ -5,7 +5,7 @@ from helpers import *
 t = time.time()
 
 # Read navigation instructions to array
-input = "d12-input.txt"
+input = mypath + "d12-input.txt"
 with open(input) as f:
     nav_codes = f.read().splitlines()
 

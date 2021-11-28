@@ -4,7 +4,7 @@ from helpers import *
 t = time.time()
 
 # Read seat sequences to array
-input = "d5-input.txt"
+input = mypath + "d5-input.txt"
 with open(input) as f:
     seats = f.read().strip().split("\n")
 

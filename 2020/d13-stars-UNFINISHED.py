@@ -4,7 +4,7 @@ from helpers import *
 t = time.time()
 
 # Read notes to array
-input = "d13-input.txt"
+input = mypath + "d13-input.txt"
 with open(input) as f:
     notes = f.read().splitlines()
 

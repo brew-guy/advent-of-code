@@ -4,7 +4,7 @@ from helpers import *
 t = time.time()
 
 # Read document to array split by double-linebreaks
-input = "d16-input.txt"
+input = mypath + "d16-input.txt"
 with open(input) as f:
     document = f.read().split("\n\n")
 
