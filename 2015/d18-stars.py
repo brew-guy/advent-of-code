@@ -5,7 +5,7 @@ from helpers import *
 
 t = time.time()
 
-input = "d18-input.txt"
+input = mypath + "d18-input.txt"
 with open(input) as f:
     grid = [row.strip() for row in f.readlines()]
     # grid = [[light for light in "." + row.strip() + "."] for row in f.readlines()]
@@ -70,7 +70,7 @@ current_frame = trimPadding(current_frame)
 lights_on = sum([row.count("#") for row in current_frame])
 
 # What does it look like animated?
-write_gif(gif_dataset, "d18-animated-1.gif", fps=5)
+write_gif(gif_dataset, mypath + "d18-animated-1.gif", fps=5)
 
 dropstar(35, lights_on, t)
 
@@ -106,6 +106,6 @@ current_frame = trimPadding(current_frame)
 lights_on = sum([row.count("#") for row in current_frame])
 
 # What does it look like animated?
-write_gif(gif_dataset, "d18-animated-2.gif", fps=5)
+write_gif(gif_dataset, mypath + "d18-animated-2.gif", fps=5)
 
 dropstar(36, lights_on, t)

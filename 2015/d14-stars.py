@@ -3,7 +3,7 @@ from helpers import *
 
 t = time.time()
 
-input = "d14-input.txt"
+input = mypath + "d14-input.txt"
 with open(input) as f:
     troopers = f.readlines()
 

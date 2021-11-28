@@ -3,7 +3,7 @@ from helpers import *
 
 t = time.time()
 
-input = "d13-input.txt"
+input = mypath + "d13-input.txt"
 with open(input) as f:
     seating = f.readlines()
 
@@ -57,7 +57,7 @@ joy = [getHappiness(party) for party in all_possible_parties]
 dropstar(25, max(joy), t)
 
 # Part 2
-input = "d13-input-2.txt"
+input = mypath + "d13-input-2.txt"
 with open(input) as f:
     seating = f.readlines()
 

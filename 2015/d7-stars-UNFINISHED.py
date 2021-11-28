@@ -3,7 +3,7 @@ from helpers import *
 
 t = time.time()
 
-input = "d7-input.txt"
+input = mypath + "d7-input.txt"
 with open(input) as f:
     connections = f.read().split("\n")
 

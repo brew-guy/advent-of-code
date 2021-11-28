@@ -3,7 +3,7 @@ from helpers import *
 
 t = time.time()
 
-input = "d16-input.txt"
+input = mypath + "d16-input.txt"
 with open(input) as f:
     aunts = f.readlines()
 

@@ -3,7 +3,7 @@ from helpers import *
 
 t = time.time()
 
-input = "d17-input.txt"
+input = mypath + "d17-input.txt"
 with open(input) as f:
     containers = [int(_) for _ in f.readlines()]
 

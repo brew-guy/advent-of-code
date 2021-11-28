@@ -3,7 +3,7 @@ from helpers import *
 
 t = time.time()
 
-input = "d15-input.txt"
+input = mypath + "d15-input.txt"
 with open(input) as f:
     ingredients = f.readlines()
 

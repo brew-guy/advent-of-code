@@ -3,7 +3,7 @@ from helpers import *
 
 t = time.time()
 
-input = "d19-input.txt"
+input = mypath + "d19-input.txt"
 with open(input) as f:
     calibrations = f.read().split("\n\n")
 

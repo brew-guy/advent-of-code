@@ -3,7 +3,7 @@ from helpers import *
 
 t = time.time()
 
-input = "d9-input.txt"
+input = mypath + "d9-input.txt"
 with open(input) as f:
     routes = f.read().split("\n")
 
