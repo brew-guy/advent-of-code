@@ -1,4 +1,3 @@
-from re import split
 import time, itertools
 from helpers import *
 
@@ -15,7 +14,6 @@ with open(items) as f:
 
 
 # Part 1
-# Guess 1: 131 - too high
 class Character:
     def __init__(self, name, hp=0, damage=0, armor=0, gold=0) -> None:
         self.name = name
@@ -95,7 +93,6 @@ r_opts = [(0, 0)] + list(itertools.combinations(ring_options, 2))
 
 equipment = list(itertools.product(w_opts, a_opts, r_opts))
 gold_init = 1000
-gold_keeper = []
 tracer = {}
 
 for round, equip in enumerate(equipment):
@@ -123,9 +120,6 @@ for round, equip in enumerate(equipment):
         if not player.alive or not boss.alive:
             break
 
-    # if player.alive:
-    gold_keeper.append((player.alive, player.spent))
-
     tracer[round] = {
         "round": round,
         "playerstatus": player.alive,
@@ -135,17 +129,13 @@ for round, equip in enumerate(equipment):
         "bstats": boss.stats,
     }
 
-
 # viewTracer(tracer)
 
-matches_won = list(filter(lambda alive: alive[0], gold_keeper))
-min_gold_winning = min(matches_won)[1]
+gold_winning = [v["gold spent"] for (k, v) in tracer.items() if v["playerstatus"]]
 
-dropstar(41, min_gold_winning, t)
+dropstar(41, min(gold_winning), t)
 
 # Part 2
+gold_losing = [v["gold spent"] for (k, v) in tracer.items() if not v["playerstatus"]]
 
-matches_lost = list(filter(lambda alive: not alive[0], gold_keeper))
-max_gold_losing = max(matches_lost)[1]
-
-dropstar(42, max_gold_losing, t)
+dropstar(42, max(gold_losing), t)
