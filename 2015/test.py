@@ -1,18 +1,85 @@
-import itertools
+from copy import deepcopy
+from sys import maxsize
+
+# 0=manacost, 1=dmg, 2=hp, 3=armour, 4=mana, 5=turns, 6=index
+missile = (53, 4, 0, 0, 0, 0, 0)
+drain = (73, 2, 2, 0, 0, 0, 1)
+shield = (113, 0, 0, 7, 0, 6, 2)
+poison = (173, 3, 0, 0, 0, 6, 3)
+recharge = (229, 0, 0, 0, 101, 5, 4)
+spells = [missile, drain, shield, poison, recharge]
+leastManaUsed = maxsize
+partTwo = False
 
 
-import itertools
+def main():
+    sim(71, 50, 500, [], True, 0)
+    print(leastManaUsed)
 
-weapon_options = ["w1", "w2", "w3", "w4", "w5"]
-w = itertools.combinations(weapon_options, 1)
 
-armor_options = ["a0", "a1", "a2", "a3", "a4", "a5"]
-a = itertools.combinations(armor_options, 1)
+def sim(bossHP, myHP, myMana, activespells, playerTurn, manaUsed):
+    bossDmg = 10
+    myArmour = 0
 
-ring_options = ["r0", "r1", "r2", "r3", "r4", "r5", "r6"]
-r = [("r0", "r0")] + list(itertools.combinations(ring_options, 2))
+    if partTwo and playerTurn:
+        myHP -= 1
+        if myHP <= 0:
+            return False
 
-i = list(itertools.product(w, a, r))
-print(i)
-print(len(i))
+    newActiveSpells = []
+    for activespell in activespells:
+        if activespell[5] >= 0:  # spell effect applies now
+            bossHP -= activespell[1]
+            myHP += activespell[2]
+            myArmour += activespell[3]
+            myMana += activespell[4]
 
+        newActiveSpell = (
+            activespell[0],
+            activespell[1],
+            activespell[2],
+            activespell[3],
+            activespell[4],
+            activespell[5] - 1,
+            activespell[6],
+        )
+        if newActiveSpell[5] > 0:  # spell carries over
+            newActiveSpells.append(newActiveSpell)
+
+    if bossHP <= 0:
+        global leastManaUsed
+        if manaUsed < leastManaUsed:
+            leastManaUsed = manaUsed
+        return True
+
+    if manaUsed >= leastManaUsed:
+        return False
+
+    if playerTurn:
+        for i in range(len(spells)):
+            spell = spells[i]
+            spellAlreadyActive = False
+            for j in range(len(newActiveSpells)):
+                if newActiveSpells[j][6] == spell[6]:
+                    spellAlreadyActive = True
+                    break
+
+            spellManaCost = spell[0]
+            if spellManaCost <= myMana and not spellAlreadyActive:
+                a = deepcopy(newActiveSpells)
+                a.append(spell)
+                sim(
+                    bossHP,
+                    myHP,
+                    myMana - spellManaCost,
+                    a,
+                    False,
+                    manaUsed + spellManaCost,
+                )
+    else:
+        myHP += myArmour - bossDmg if myArmour - bossDmg < 0 else -1
+        if myHP > 0:
+            sim(bossHP, myHP, myMana, newActiveSpells, True, manaUsed)
+
+
+main()

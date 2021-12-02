@@ -129,7 +129,7 @@ for round, equip in enumerate(equipment):
         "bstats": boss.stats,
     }
 
-# viewTracer(tracer)
+viewTracer(tracer)
 
 gold_winning = [v["gold spent"] for (k, v) in tracer.items() if v["playerstatus"]]
 

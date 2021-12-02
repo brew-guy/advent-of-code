@@ -1,181 +1,172 @@
-import time, itertools
+import time, random
 from helpers import *
 
 t = time.time()
 
-input = mypath + "d21-input.txt"
+input = mypath + "d22-input.txt"
 with open(input) as f:
     boss_stats = [int(stat.split(":")[1]) for stat in f.read().split("\n")]
 
-# Additional text file with puzzle player shop items
-items = mypath + "d21-items.txt"
-with open(items) as f:
-    items = f.read().split("\n\n")
-
+logging = False
+log = lambda line: print(line) if logging else None
 
 # Part 1
-# Generér en effects queue som afspiller effects i starten af hver tur.
-# Hvis en effekt stopper, skal den fjernes fra queue, så f.eks. samme spell
-# kan kastes og trigge samme effekt i samme tur som en effekt ophører
-
-
 class Character:
     def __init__(self, name, hp=0, damage=0, armor=0, mana=0) -> None:
         self.name = name
         self.stats = {"hp": hp, "damage": damage, "armor": armor, "mana": mana}
-        self.items = []
-        self.spells = []
-        self.effects = []
-        self.gold = 0
         self.alive = True
-
-    def addItem(self, item):
-        self.items.append(item)
-        self.gold -= item.cost
-        self.stats["damage"] += item.damage
-        self.stats["armor"] += item.armor
-        # print(f"{self.name} equipped {item.name}.")
-
-    def addSpell(self, spell):
-        self.spells.append(spell)
-        # print(f"{self.name} equipped {spell.name}.")
+        self.manaspent = 0
 
     def castSpell(self, spell):
         self.stats["mana"] -= spell.mana
-        pass
+        self.manaspent += spell.mana
+        boss.stats["hp"] -= spell.damage
+        self.stats["hp"] += spell.heal
+        log(
+            f"  🪄  {spell.name} | cost {spell.mana} | deals {spell.damage} dmg | heals {spell.heal}"
+        )
+        if spell.damage > 0:
+            log(f"  ⚔️  {spell.name} deals {spell.damage} damage")
+        if spell.heal > 0:
+            log(f"  ❤️  {spell.name} heals {spell.heal} hp")
+        spell.trigger()
 
     def attack(self, opponent):
         dmg = max(1, self.stats["damage"] - opponent.stats["armor"])
         opponent.stats["hp"] -= dmg
-        # print(f"{self.name} dealt {dmg} damage to {opponent.name}.")
+        log(f"  ⚔️  {self.name} deals {dmg} damage to {opponent.name}")
         if opponent.stats["hp"] <= 0:
             opponent.alive = False
-            # print(f"{opponent.name} was killed by {self.name}.")
-
-
-class Item:
-    def __init__(self, name, cost, damage, armor, type=None) -> None:
-        self.name = name
-        self.cost = cost
-        self.damage = damage
-        self.armor = armor
-        self.type = type
+            log(f"  💀  {opponent.name} was killed by {self.name}")
 
 
 class Spell:
-    def __init__(self, name, mana, damage=0, heal=0, effect=0, type=None) -> None:
+    def __init__(self, name, mana, damage=0, heal=0, effect=None) -> None:
         self.name = name
         self.mana = mana
         self.damage = damage
         self.heal = heal
-        self.type = "Spell"
+        self.effect = effect
+
+    def trigger(self):
+        if self.effect is not None:
+            effects_queue.append(self.effect)
 
 
 class Effect:
-    def __init__(self, turns, armor, damage, mana) -> None:
+    def __init__(self, name, turns=0, armor=0, damage=0, mana=0) -> None:
+        self.name = name
         self.turns = turns
         self.armor = armor
         self.damage = damage
         self.mana = mana
 
     def ping(self):
-        # apply effects and count down turns counter on ping
-        # then wear off effect if turn = 0
-        pass
+        # For crying out loud this part sucks!
+        if self.armor != 0:
+            player.stats["armor"] = self.armor
+        boss.stats["hp"] -= self.damage
+        player.stats["mana"] += self.mana
+        self.turns -= 1
+        if self.turns < 1:
+            player.stats["armor"] -= self.armor
+            log(f"  🍃 {self.name} wears off")
+            return False
+        else:
+            log(f"  ⏱️  {self.name} is active for {self.turns} more turns")
+            return True
 
 
-# Items from list of string -> list of objects
-def getItems(item_string):
-    items = [i.split(",") for i in item_string.split("\n")]
-    items = [[int(i) if i.isdigit() else i for i in item] for item in items]
-    return [Item(*i) for i in items]
+def getSpell(name):
+    if name == "Magic Missile":
+        return Spell("Magic Missile", 53, 4)
+    if name == "Drain":
+        return Spell("Drain", 73, 2, 2)
+    if name == "Shield":
+        return Spell("Shield", 113, 0, 0, Effect("shield", 6, 7))
+    if name == "Poison":
+        return Spell("Poison", 173, 0, 0, Effect("poison", 6, 0, 3))
+    if name == "Recharge":
+        return Spell("Recharge", 229, 0, 0, Effect("recharge", 5, 0, 0, 101))
 
 
-def viewTracer(tracer):
-    for round in range(len(tracer)):
-        viewTrace(tracer, round)
+def applyEffects(queue):
+    new_queue = []
+    for effect in queue:
+        if effect.ping():
+            new_queue.append(effect)
+    return new_queue
 
 
-def viewTrace(tracer, round):
-    outcome = "Won!" if tracer[round]["playerstatus"] else "Lost"
-    items = ", ".join(
-        [
-            "(" + t.type[0] + "-" + str(t.cost) + ") " + t.name
-            for t in tracer[round]["items"]
-        ]
-    )
-    cost = tracer[round]["gold spent"]
-    ps = tracer[round]["pstats"]
-    pstats = ps["hp"], ps["damage"], ps["armor"]
-    bs = tracer[round]["bstats"]
-    bstats = bs["hp"], bs["damage"], bs["armor"]
-    print(f"{round+1} | {outcome} | H/D/A: {pstats} {bstats} | {cost} | {items}")
+def getAvailableSpells():
+    available = []
+    effects = [effect.name for effect in effects_queue if effect.turns > 1]
+    for spell in spellbook:
+        if (
+            spellbook[spell]["mana"] < player.stats["mana"]
+            and spellbook[spell]["effect"] not in effects
+        ):
+            available.append(spell)
+    return available
 
 
-weapons = getItems(items[0])
-armors = getItems(items[1])
-rings = getItems(items[2])
+spellbook = {
+    "Magic Missile": {"mana": 53, "effect": ""},
+    "Drain": {"mana": 73, "effect": ""},
+    "Shield": {"mana": 113, "effect": "shield"},
+    "Poison": {"mana": 173, "effect": "poison"},
+    "Recharge": {"mana": 229, "effect": "recharge"},
+}
 
-# Calculate item combinations
-weapon_options = [1, 2, 3, 4, 5]
-w_opts = itertools.combinations(weapon_options, 1)
+spent_mana = []
+best_case = []
 
-armor_options = [0, 1, 2, 3, 4, 5]
-a_opts = itertools.combinations(armor_options, 1)
-
-ring_options = [0, 1, 2, 3, 4, 5, 6]
-r_opts = [(0, 0)] + list(itertools.combinations(ring_options, 2))
-
-equipment = list(itertools.product(w_opts, a_opts, r_opts))
-gold_init = 1000
-tracer = {}
-
-# Initiate an effects queue
-effects_queue = []
-
-for round, equip in enumerate(equipment):
-    # Reset players
-    player = Character("Player", 100, 0, 0, gold_init)
+for battle in range(10):
+    # Initiate battle
+    player = Character("Player", 50, 0, 0, 500)
     boss = Character("Boss", *boss_stats)
-
-    # Equip player
-    w, a, r = equip
-    if w[0] != 0:
-        player.addItem(weapons[w[0] - 1])
-    if a[0] != 0:
-        player.addItem(armors[a[0] - 1])
-    if r[0] != 0:
-        player.addItem(rings[r[0] - 1])
-    if r[1] != 0:
-        player.addItem(rings[r[1] - 1])
+    effects_queue = []
+    round = 1
+    still_standing = True
 
     # Fight
-    # Apply active effects from trigger queue
-    # <insert effect.ping() here>
-    while True:
+    while still_standing:
+
+        # Player turn
+        log(f"Player turn: {player.stats}")
+        effects_queue = applyEffects(effects_queue)
+        spells = getAvailableSpells()
+        if len(spells) < 1:
+            log(f"  💀  Player died because of no spells to cast")
+            still_standing = False
+            continue
+
         if player.alive and boss.alive:
-            player.attack(boss)
+            player.castSpell(getSpell(random.choice(spells)))
+
+        # Boss turn
+        log(f"Boss turn: {boss.stats}")
+        effects_queue = applyEffects(effects_queue)
+
         if player.alive and boss.alive:
             boss.attack(player)
+
+        log(f"End of round {round}\n[P]: {player.stats}\n[B]: {boss.stats}\n")
+
+        print(player.alive, boss.alive)
+
         if not player.alive or not boss.alive:
-            break
+            still_standing = False
+            if player.alive:
+                spent_mana.append(player.manaspent)
+            best_case.append((player.stats["hp"], boss.stats["hp"]))
+        round += 1
 
-    tracer[round] = {
-        "round": round,
-        "playerstatus": player.alive,
-        "items": player.items,
-        "gold spent": player.spent,
-        "pstats": player.stats,
-        "bstats": boss.stats,
-    }
-
-# viewTracer(tracer)
-
-gold_winning = [v["gold spent"] for (k, v) in tracer.items() if v["playerstatus"]]
-
-dropstar(41, min(gold_winning), t)
+print(spent_mana)
+print(sorted(best_case))
+# dropstar(43, , t)
 
 # Part 2
-gold_losing = [v["gold spent"] for (k, v) in tracer.items() if not v["playerstatus"]]
 
-dropstar(42, max(gold_losing), t)
+# dropstar(44, , t)
