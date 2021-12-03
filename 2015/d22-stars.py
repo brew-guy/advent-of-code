@@ -11,6 +11,11 @@ logging = False
 log = lambda line: print(line) if logging else None
 
 # Part 1
+# Terrible solution that simulates a million battles
+# Thus correct answer is not guaranteed on first try 😿
+# Guess 1: 1957 - too high
+# Guess 2: 1844 - too high
+# Guess 3: 1824 - correct
 class Character:
     def __init__(self, name, hp=0, damage=0, armor=0, mana=0) -> None:
         self.name = name
@@ -18,10 +23,10 @@ class Character:
         self.alive = True
         self.manaspent = 0
 
-    def castSpell(self, spell):
+    def castSpell(self, spell, opponent, queue):
         self.stats["mana"] -= spell.mana
         self.manaspent += spell.mana
-        boss.stats["hp"] -= spell.damage
+        self.spellDamage(spell.damage, opponent)
         self.stats["hp"] += spell.heal
         log(
             f"  🪄  {spell.name} | cost {spell.mana} | deals {spell.damage} dmg | heals {spell.heal}"
@@ -30,15 +35,28 @@ class Character:
             log(f"  ⚔️  {spell.name} deals {spell.damage} damage")
         if spell.heal > 0:
             log(f"  ❤️  {spell.name} heals {spell.heal} hp")
-        spell.trigger()
+        spell.trigger(queue)
+        self.killCheck(opponent)
+
+    def spellDamage(self, damage, opponent):
+        opponent.stats["hp"] -= damage
+        self.killCheck(opponent)
+
+    def lifeSucks(self, damage):
+        self.stats["hp"] -= damage
+        log(f"  🦟  a deathquito deals {damage} damage to {self.name}")
+        self.killCheck(self)
 
     def attack(self, opponent):
         dmg = max(1, self.stats["damage"] - opponent.stats["armor"])
         opponent.stats["hp"] -= dmg
         log(f"  ⚔️  {self.name} deals {dmg} damage to {opponent.name}")
-        if opponent.stats["hp"] <= 0:
-            opponent.alive = False
-            log(f"  💀  {opponent.name} was killed by {self.name}")
+        self.killCheck(opponent)
+
+    def killCheck(self, target):
+        if target.stats["hp"] <= 0:
+            target.alive = False
+            log(f"  💀  {target.name} was killed by {self.name}")
 
 
 class Spell:
@@ -49,9 +67,9 @@ class Spell:
         self.heal = heal
         self.effect = effect
 
-    def trigger(self):
+    def trigger(self, queue):
         if self.effect is not None:
-            effects_queue.append(self.effect)
+            queue.append(self.effect)
 
 
 class Effect:
@@ -62,11 +80,10 @@ class Effect:
         self.damage = damage
         self.mana = mana
 
-    def ping(self):
-        # For crying out loud this part sucks!
+    def ping(self, player, opponent):
         if self.armor != 0:
             player.stats["armor"] = self.armor
-        boss.stats["hp"] -= self.damage
+        opponent.stats["hp"] -= self.damage
         player.stats["mana"] += self.mana
         self.turns -= 1
         if self.turns < 1:
@@ -91,17 +108,17 @@ def getSpell(name):
         return Spell("Recharge", 229, 0, 0, Effect("recharge", 5, 0, 0, 101))
 
 
-def applyEffects(queue):
+def applyEffects(queue, player, opponent):
     new_queue = []
     for effect in queue:
-        if effect.ping():
+        if effect.ping(player, opponent):
             new_queue.append(effect)
     return new_queue
 
 
-def getAvailableSpells():
+def getAvailableSpells(player, queue):
     available = []
-    effects = [effect.name for effect in effects_queue if effect.turns > 1]
+    effects = [effect.name for effect in queue if effect.turns > 1]
     for spell in spellbook:
         if (
             spellbook[spell]["mana"] < player.stats["mana"]
@@ -119,54 +136,58 @@ spellbook = {
     "Recharge": {"mana": 229, "effect": "recharge"},
 }
 
-spent_mana = []
-best_case = []
 
-for battle in range(10):
-    # Initiate battle
-    player = Character("Player", 50, 0, 0, 500)
-    boss = Character("Boss", *boss_stats)
-    effects_queue = []
-    round = 1
-    still_standing = True
+def fight(run_battles, level="normal"):
+    spent_mana = []
+    for battle in range(run_battles):
+        # Initiate battle
+        player = Character("Player", 50, 0, 0, 500)
+        boss = Character("Boss", *boss_stats)
+        effects_queue = []
+        round = 1
+        still_standing = True
 
-    # Fight
-    while still_standing:
+        # Fight
+        while still_standing:
 
-        # Player turn
-        log(f"Player turn: {player.stats}")
-        effects_queue = applyEffects(effects_queue)
-        spells = getAvailableSpells()
-        if len(spells) < 1:
-            log(f"  💀  Player died because of no spells to cast")
-            still_standing = False
-            continue
+            # Player turn
+            log(f"Player turn: {player.stats}")
+            if level == "hard":
+                player.lifeSucks(1)
+            effects_queue = applyEffects(effects_queue, player, boss)
+            spells = getAvailableSpells(player, effects_queue)
+            if len(spells) < 1:
+                log(f"  💀  Player died because of no spells to cast")
+                player.alive = False
+                still_standing = False
 
-        if player.alive and boss.alive:
-            player.castSpell(getSpell(random.choice(spells)))
+            # Boss turn
+            if player.alive and boss.alive:
+                player.castSpell(getSpell(random.choice(spells)), boss, effects_queue)
+                log(f"Boss turn: {boss.stats}")
+                if level == "hard":
+                    player.lifeSucks(1)
+                effects_queue = applyEffects(effects_queue, player, boss)
 
-        # Boss turn
-        log(f"Boss turn: {boss.stats}")
-        effects_queue = applyEffects(effects_queue)
+            if player.alive and boss.alive:
+                boss.attack(player)
 
-        if player.alive and boss.alive:
-            boss.attack(player)
+            log(
+                f"End of battle {battle} | round {round}\n[P]: {player.stats}\n[B]: {boss.stats}\n"
+            )
 
-        log(f"End of round {round}\n[P]: {player.stats}\n[B]: {boss.stats}\n")
+            if not player.alive or not boss.alive:
+                still_standing = False
+                if player.alive:
+                    spent_mana.append(player.manaspent)
+            round += 1
+    return spent_mana
 
-        print(player.alive, boss.alive)
 
-        if not player.alive or not boss.alive:
-            still_standing = False
-            if player.alive:
-                spent_mana.append(player.manaspent)
-            best_case.append((player.stats["hp"], boss.stats["hp"]))
-        round += 1
-
-print(spent_mana)
-print(sorted(best_case))
-# dropstar(43, , t)
+mana = fight(1000000)
+dropstar(43, min(mana), t)
 
 # Part 2
-
-# dropstar(44, , t)
+# Not working on one million sims... :(
+mana = fight(1000000, "hard")
+dropstar(44, min(mana), t)
