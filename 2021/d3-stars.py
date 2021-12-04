@@ -8,9 +8,9 @@ with open(input) as f:
     report = [[int(bit) for bit in binary] for binary in f.read().split("\n")]
 
 # Part 1
-def mostCommon(list):
-    count_ones = [sum(bit) for bit in zip(*list)]
-    most_common = [int(d / len(list) >= 0.5) for d in count_ones]
+def mostCommon(bit_list):  # most common bit per bit index
+    count_ones = [sum(bit) for bit in zip(*bit_list)]
+    most_common = [int(d / len(bit_list) >= 0.5) for d in count_ones]
     return most_common
 
 
@@ -19,8 +19,8 @@ def bitString(bit_list):
 
 
 bin_len = len(report[0])
-
 most_common = mostCommon(report)
+
 gamma = bitString(most_common)
 epsilon = bitString([1 - b for b in most_common])
 power = int(gamma, 2) * int(epsilon, 2)
