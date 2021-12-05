@@ -1,85 +1,58 @@
-from copy import deepcopy
-from sys import maxsize
+import itertools, math
+from helpers import *
 
-# 0=manacost, 1=dmg, 2=hp, 3=armour, 4=mana, 5=turns, 6=index
-missile = (53, 4, 0, 0, 0, 0, 0)
-drain = (73, 2, 2, 0, 0, 0, 1)
-shield = (113, 0, 0, 7, 0, 6, 2)
-poison = (173, 3, 0, 0, 0, 6, 3)
-recharge = (229, 0, 0, 0, 101, 5, 4)
-spells = [missile, drain, shield, poison, recharge]
-leastManaUsed = maxsize
-partTwo = False
+input = mypath + "d24-input.txt"
+with open(input) as f:
+    weights = [int(w) for w in f.read().split("\n")]
 
 
-def main():
-    sim(71, 50, 500, [], True, 0)
-    print(leastManaUsed)
+def canPartition(arr):
+    n = len(arr)
+    Sum = 0
+    for i in range(n):
+        Sum += arr[i]
+    if Sum % 2 != 0:
+        return 0
+    part = [0] * ((Sum // 2) + 1)
+    for i in range((Sum // 2) + 1):
+        part[i] = 0
+    for i in range(n):
+        for j in range(Sum // 2, arr[i] - 1, -1):
+            if part[j - arr[i]] == 1 or j == arr[i]:
+                part[j] = 1
+    return part[Sum // 2]
 
 
-def sim(bossHP, myHP, myMana, activespells, playerTurn, manaUsed):
-    bossDmg = 10
-    myArmour = 0
-
-    if partTwo and playerTurn:
-        myHP -= 1
-        if myHP <= 0:
-            return False
-
-    newActiveSpells = []
-    for activespell in activespells:
-        if activespell[5] >= 0:  # spell effect applies now
-            bossHP -= activespell[1]
-            myHP += activespell[2]
-            myArmour += activespell[3]
-            myMana += activespell[4]
-
-        newActiveSpell = (
-            activespell[0],
-            activespell[1],
-            activespell[2],
-            activespell[3],
-            activespell[4],
-            activespell[5] - 1,
-            activespell[6],
-        )
-        if newActiveSpell[5] > 0:  # spell carries over
-            newActiveSpells.append(newActiveSpell)
-
-    if bossHP <= 0:
-        global leastManaUsed
-        if manaUsed < leastManaUsed:
-            leastManaUsed = manaUsed
-        return True
-
-    if manaUsed >= leastManaUsed:
-        return False
-
-    if playerTurn:
-        for i in range(len(spells)):
-            spell = spells[i]
-            spellAlreadyActive = False
-            for j in range(len(newActiveSpells)):
-                if newActiveSpells[j][6] == spell[6]:
-                    spellAlreadyActive = True
-                    break
-
-            spellManaCost = spell[0]
-            if spellManaCost <= myMana and not spellAlreadyActive:
-                a = deepcopy(newActiveSpells)
-                a.append(spell)
-                sim(
-                    bossHP,
-                    myHP,
-                    myMana - spellManaCost,
-                    a,
-                    False,
-                    manaUsed + spellManaCost,
-                )
-    else:
-        myHP += myArmour - bossDmg if myArmour - bossDmg < 0 else -1
-        if myHP > 0:
-            sim(bossHP, myHP, myMana, newActiveSpells, True, manaUsed)
+def findSequences(numbers, target):
+    result = []
+    for i in range(len(numbers), 0, -1):
+        for seq in itertools.combinations(numbers, i):
+            if sum(seq) == target:
+                result.append(seq)
+    return result
 
 
-main()
+target = sum(weights) // 4
+print(f"Packages: {len(weights)} | weight: {sum(weights)} | 1/4 weight = {target}")
+
+seqs = findSequences(weights, target)
+print(f"Found {len(seqs)} sequences of weight {target}.")
+
+# validated = []
+# for seq in seqs:
+#     remains = list(set(weights).difference(seq))
+#     if canPartition(remains):
+#         validated.append(seq)
+
+
+def quantumEntanglement(partition):
+    return math.prod(partition)
+
+
+fewest_packages = min([len(g) for g in seqs])
+first_group = [g for g in seqs if len(g) == fewest_packages]
+if len(first_group) > 1:
+    quantum = sorted([(quantumEntanglement(g), g) for g in first_group])
+
+print(quantum[0][0])
+
