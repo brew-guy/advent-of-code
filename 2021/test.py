@@ -1,17 +1,13 @@
-a = [
-    ["x", 1, 54, 92, 80],
-    ["x", 50, 11, 27, 78],
-    ["x", 9, 25, 38, 20],
-    ["x", 90, 39, 37, 15],
-    [87, 87, 87, 87, 87],
-]
+a = (306, 537)
+b = (38, 805)  # (39, 804) ... (306, 537)
 
+x1, y1, x2, y2 = a[0], a[1], b[0], b[1]
 
-def boardSum(board):
-    return [n for row in board for n in row if isinstance(n, int)]
+x_range = range(min(x1, x2), max(x1, x2) + 1)
+y_range = range(min(y1, y2), max(y1, y2) + 1)
+if y1 < y2:
+    y_range = reversed(y_range)
 
-
-print(a)
-b = [["x" if x == 1 else x for x in row] for row in a]
-print(b)
-print(boardSum(a))
+print(x_range, y_range)
+c = zip(x_range, y_range)
+print(*c)
