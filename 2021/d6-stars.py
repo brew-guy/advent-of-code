@@ -8,10 +8,10 @@ with open(input) as f:
     fishes = [int(fish) for fish in f.read().split(",")]
 
 # Part 1
-def nextGen(shoal):
+def recursiveBreeding(shoal, generations):
     new_shoal, new_born = [], []
-    if isinstance(shoal, int):
-        shoal = [shoal]
+    if generations < 1:
+        return len(shoal)
     for fish in shoal:
         if fish == 0:
             new_shoal.append(6)
@@ -19,25 +19,12 @@ def nextGen(shoal):
         else:
             new_shoal.append(fish - 1)
     new_shoal += new_born
-    return new_shoal
+    generations -= 1
+    return recursiveBreeding(new_shoal, generations)
 
 
-# shoal = fishes.copy()
-shoal = [8]
-for i in range(45):
-    print(i, shoal)
-    shoal = nextGen(shoal)
-
-print(i + 1, shoal)
-
-dropstar(11, len(shoal), t)
+dropstar(11, recursiveBreeding(fishes, 80), t)
 
 # Part 2
-# shoal = 0
 
-# for i in range(80):
-#     shoal = nextGen(shoal)
-#     print(i, len(shoal))
-
-
-# dropstar(12, len(shoal), t)
+dropstar(12, recursiveBreeding(fishes, 256), t)
