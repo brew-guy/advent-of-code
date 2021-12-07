@@ -8,6 +8,4 @@ y_range = range(min(y1, y2), max(y1, y2) + 1)
 if y1 < y2:
     y_range = reversed(y_range)
 
-print(x_range, y_range)
 c = zip(x_range, y_range)
-print(*c)
