@@ -13,9 +13,9 @@ def scootToPos(x):
 
 
 # https://www.youtube.com/watch?v=wJqOwyA9iqY&t=192s
-sliddle = [scootToPos(i) for i in range(min(crabs), max(crabs) + 1)]
+slidle = [scootToPos(i) for i in range(min(crabs), max(crabs) + 1)]
 
-dropstar(13, min(sliddle), t)
+dropstar(13, min(slidle), t)
 
 # Part 2
 def sumOfIntegers(first, last):
@@ -27,6 +27,6 @@ def increasedScootToPos(x):
     return sum([sumOfIntegers(1, abs(c - x)) for c in crabs])
 
 
-sliddle = [increasedScootToPos(i) for i in range(min(crabs), max(crabs) + 1)]
+slidle = [increasedScootToPos(i) for i in range(min(crabs), max(crabs) + 1)]
 
-dropstar(14, min(sliddle), t)
+dropstar(14, min(slidle), t)
