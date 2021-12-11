@@ -7,8 +7,6 @@ input = mypath + "d6-input.txt"
 with open(input) as f:
     fishes = [int(fish) for fish in f.read().split(",")]
 
-sample = 3, 4, 3, 1, 2
-
 # Part 1
 # Baaad solution! Go away! Shoo!
 def recursiveBreeding(shoal, generations):
