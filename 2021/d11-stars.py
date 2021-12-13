@@ -1,5 +1,5 @@
 import time, numpy as np
-from numpy.core.numeric import ones
+from array2gif import write_gif  # https://pypi.org/project/array2gif/
 from helpers import *
 
 t = time.time()
@@ -77,11 +77,21 @@ def isSynchronousFlash(grid):
     return all(flatten([[octo == 0 for octo in row] for row in grid]))
 
 
-step, await_flash = 0, True
+def grid2numpy(grid):
+    array = [[[0, 28 * octo, 0] for octo in row] for row in grid]
+    return np.array(array)
+
+
 grid_run = grid.copy()
+gif_dataset = [grid2numpy(grid_run)]
+step, await_flash = 0, True
 while await_flash:
     step += 1
     grid_run, flashed = oneStep(grid_run)
     await_flash = not isSynchronousFlash(grid_run)
+    gif_dataset.append(grid2numpy(grid_run))
 
 dropstar(22, step, t)
+
+# What does it look like animated?
+write_gif(gif_dataset, mypath + "d11-animated.gif", fps=25)
