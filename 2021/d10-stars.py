@@ -57,6 +57,6 @@ for line in subsystem:
             ac_score = ac_score * 5 + ac_points[bracket]
         ac_scoreboard.append(ac_score)
 
-middle = statistics.median(ac_scoreboard)
+median = statistics.median(ac_scoreboard)
 
-dropstar(20, middle, t)
+dropstar(20, median, t)
