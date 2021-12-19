@@ -1,14 +1,3 @@
-template = "NNCB"
-# N:2, C:1, B:1
+a = "00111000000000000110111101000101001010010001001000000000"
 
-# NN -> NC, CN
-# NC -> NB, BC
-# CB -> CH, HB
-# N:2, C:2, B:2, H:1
-# -> NCNBCHB
-# N:2, C:2, B:2, H:1
-
-
-a = {"a": 5, "b": 10}
-for i in a.items():
-    print(i)
+print(len(a) - 6 - 1 - 15 - 27)
