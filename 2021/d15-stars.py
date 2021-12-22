@@ -7,11 +7,9 @@ t = time.time()
 
 input = mypath + "d15-input.txt"
 with open(input) as f:
-    map = [[int(c) for c in row] for row in f.read().split("\n")]
+    map = np.array([[int(c) for c in row] for row in f.read().split("\n")])
 
-# print(map)
-
-
+# Part 1
 def reconstruct_path(came_from, current):
     total_path = [current]
     while current in came_from.keys():
@@ -24,6 +22,7 @@ def path_sum(map, path):
     return sum(map[p[0]][p[1]] for p in path)
 
 
+# My heuristics are broken... but whyyy?
 def h(matrix, node, goal):
     # Manhattan distance heuristic
     # dx, dy = abs(node[0] - goal[0]), abs(node[1] - goal[1])
@@ -73,22 +72,24 @@ def aStar(map, start, goal):
     return "Problem: No path found!"
 
 
-pth = aStar(map, (0, 0), (99, 99))
-# print(pth)
-print(path_sum(map, pth) - map[0][0])
+best_path = aStar(map, (0, 0), (99, 99))
+best_path_sum = path_sum(map, best_path) - map[0][0]  # don't count start node
 
+dropstar(29, best_path_sum, t)
 
+# Part 2
 def growMap(map, step):
     return np.array([[1 + ((val + step - 1) % 9) for val in row] for row in map])
 
 
 # Expand the base map to 5 times size of increasing values
-map = np.array(map)
 map_matrix = [[growMap(map, row + col) for col in range(5)] for row in range(5)]
 map_rows = [np.concatenate(map_row, axis=1) for map_row in map_matrix]
 big_map = np.concatenate(map_rows)
 
+np.savetxt(mypath + "d15-big-map.txt", big_map, delimiter="", fmt="%d")
 
-pth = aStar(big_map, (0, 0), (499, 499))
-print(path_sum(big_map, pth) - map[0][0])
+best_path = aStar(big_map, (0, 0), (499, 499))
+best_path_sum = path_sum(big_map, best_path) - map[0][0]  # don't count start node
 
+dropstar(30, best_path_sum, t)
