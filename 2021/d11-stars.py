@@ -21,17 +21,16 @@ def cooldown(grid):
     return [[octo if octo <= 9 else 0 for octo in row] for row in grid]
 
 
-def getNeighbours(grid, row, col):
-    n = (row - 1, col) if row > 0 else None
-    s = (row + 1, col) if row < len(grid) - 1 else None
-    e = (row, col + 1) if col < len(grid[0]) - 1 else None
-    w = (row, col - 1) if col > 0 else None
-    ne = (row - 1, col + 1) if row > 0 and col < len(grid[0]) - 1 else None
-    se = (row + 1, col + 1) if row < len(grid) - 1 and col < len(grid[0]) - 1 else None
-    nw = (row - 1, col - 1) if row > 0 and col > 0 else None
-    sw = (row + 1, col - 1) if row < len(grid) - 1 and col > 0 else None
-    coords = [n, ne, e, se, s, sw, w, nw]
-    return [coord for coord in coords if coord != None]
+def getNeighbours(matrix, row, col):
+    # N S E W NE SE SW NW
+    dx = [0, 0, 1, -1, 1, 1, -1, -1]
+    dy = [-1, 1, 0, 0, -1, 1, 1, -1]
+    adjacents = []
+    for i in range(len(dx)):
+        ax, ay = row + dy[i], col + dx[i]
+        if min(ax, ay) >= 0 and ax < len(matrix) and ay < len(matrix[0]):
+            adjacents.append([ax, ay])
+    return adjacents
 
 
 def whoFlashed(grid):
