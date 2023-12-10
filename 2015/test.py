@@ -1,9 +1,4 @@
-def evaluate(cell):
-    operation, arg_1, arg_2 = cell
+print(456 & 123)
 
-
-a = ["jmp", "reg1", 4]
-evaluate(a)
-
-b = ["jmp", "reg1"]
-evaluate(b)
+print(bin(456))
+print(bin(123))

@@ -1,5 +1,6 @@
 import time
 import networkx as nx
+from networkx.algorithms.cycles import cycle_basis
 from networkx.classes.function import to_undirected
 from helpers import *
 
@@ -8,6 +9,8 @@ t = time.time()
 input = mypath + "d12-sample.txt"
 with open(input) as f:
     connections = [path.split("-") for path in f.read().split("\n")]
+
+print(connections)
 
 # Part 1
 def find_all_paths(graph, start, end, path=[]):
@@ -40,10 +43,13 @@ for connection in connections:
 G = nx.Graph()
 G.add_nodes_from(caves)
 G.add_edges_from(connections)
-p = nx.recursive_simple_cycles(G)
-# print(p)
-for pth in p:
-    print(pth)
+
+simple_paths = nx.all_simple_paths(G, "start", "end")
+cycles = nx.cycle_basis(G)
+traversal = nx.all_pairs_shortest_path_length(G)
+# print(traversal)
+for t in traversal:
+    print(t)
 
 # for part in cave_parts:
 

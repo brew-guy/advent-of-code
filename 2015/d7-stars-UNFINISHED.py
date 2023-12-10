@@ -83,11 +83,29 @@ class Or(Gate2):  # two input OR gate.
         self.C.set(self.A.value or self.B.value)
 
 
+class Lshift(Gate2):  # two input lshift gate.
+    def __init__(self, name):
+        Gate2.__init__(self, name)
+
+    def evaluate(self):
+        self.C.set(self.A.value << self.B.value)
+
+
+class Rshift(Gate2):  # two input rshift gate.
+    def __init__(self, name):
+        Gate2.__init__(self, name)
+
+    def evaluate(self):
+        self.C.set(self.A.value >> self.B.value)
+
+
 a = And("And1")
 a.C.monitor = 1
+
 n = Not("Not1")
 a.C.connect(n.A)
 n.B.monitor = 1
+
 a.A.set(1)
 a.B.set(0)
 
@@ -108,6 +126,11 @@ for connection in connections:
     for r in gates:
         parts = parts.replace(*r)
     circuit[wire] = parts
+
+# print(circuit)
+
+gates = [And(gate) for gate in circuit.keys()]
+print(gates[10])
 
 # regex_not = r"^([A-Z]*) ([a-z]*) -> ([a-z]*)$"
 # regex_gate = r"^([a-z\d]*) ([A-Z]*) ([a-z\d]*) -> ([a-z]*)$"
